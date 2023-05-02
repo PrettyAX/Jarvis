@@ -13,20 +13,7 @@ FAVORITES = [
 ]
 
 
-def print_in_color(change):
-    """
-    Prints the price change with color. If the price is down, print in red.
-    If the price is up, print in green.
 
-    Parameters
-    ----------
-    change: str
-        The price change.
-    """
-    if float(change) < 0:
-        return Fore.RED + str(change) + Fore.RESET
-    else:
-        return Fore.GREEN + str(change) + Fore.RESET
 
 
 def check_prices(base, target):
@@ -44,32 +31,38 @@ def check_prices(base, target):
     """
 
     # build the api url
-    url = 'https://api.cryptonator.com/api/ticker/{}-{}'.format(
+    url = 'https://api.api-ninjas.com/v1/cryptoprice?symbol={}{}'.format(
         base.lower(), target.lower())
 
     try:
         response = requests.get(
-            url, headers={
-                'User-Agent': 'Jarvis'}).json()
-        price = response['ticker']['price']
-        change = response['ticker']['change']
+            url, headers={'X-Api-Key': 'NtgQxUQ02CDzcA5It1e/0w==25CTvSFoQ2nBBCSm'}).json()
+        price = response['price']
+
 
     # this error occurs if the pair is non-existent
     except KeyError:
         print(
             "{WARNING}Wrong pair {}/{}!{COLOR_RESET} "
             "\nFull list of symbols is here: "
-            "https://coinmarketcap.com/all/views/all/"
             "\n".format(
                 base,
                 target,
                 WARNING=Fore.RED,
                 COLOR_RESET=Fore.RESET))
-
+        api_url = 'https://api.api-ninjas.com/v1/cryptosymbols'
+        response = requests.get(api_url, headers={'X-Api-Key': 'NtgQxUQ02CDzcA5It1e/0w==25CTvSFoQ2nBBCSm'}).json()
+        if response['symbols']:
+            print("All possible pairs are: ")
+            for symbol in response['symbols']:
+                print(symbol)
+        else:
+            print("No symbols found")
+        print("Please format the query as 'cryptotracker XXX/XXX'")
     # results
     else:
-        print("\t{}/{}\nPrice: {}\nChange: {}\n".format(base.upper(),
-              target.upper(), price, print_in_color(change)))
+        print("\t{}/{}\nPrice: {}\n".format(base.upper(),
+              target.upper(), price))
 
 
 @plugin("cryptotracker")
